@@ -90,6 +90,7 @@ module Clickhouse
         end
 
         def parse_date_time_value(value)
+          return nil if value == '0000-00-00 00:00:00'
           Time.parse(value)
         end
 
