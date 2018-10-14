@@ -37,7 +37,9 @@ module Clickhouse
     private
 
       def client
-        @client ||= Faraday.new(:url => url)
+        @client ||= @config[:scheme] == 'https' && @config[:ssl] ? 
+          Faraday.new(:url => url, ssl: @config[:ssl]) : 
+          Faraday.new(:url => url)
       end
 
       def ensure_authentication
