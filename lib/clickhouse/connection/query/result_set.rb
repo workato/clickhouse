@@ -61,6 +61,8 @@ module Clickhouse
               parse_date_value value
             when "DateTime"
               parse_date_time_value value
+            when /DateTime\(/
+              parse_date_time_value(value, type.scan(/DateTime\('(.*)'\)/)&.first&.first)
             when /Array\(/
               parse_array_value value
             else
@@ -89,9 +91,9 @@ module Clickhouse
           Date.parse(value)
         end
 
-        def parse_date_time_value(value)
+        def parse_date_time_value(value, tz=nil)
           return nil if value == '0000-00-00 00:00:00'
-          Time.parse(value)
+          tz ? Time.parse(value + " " + tz) : Time.parse(value)
         end
 
         def parse_array_value(value)
