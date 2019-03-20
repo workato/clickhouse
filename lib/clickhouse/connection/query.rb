@@ -20,7 +20,7 @@ module Clickhouse
       def query_post(query)
         query = Utils.extract_format(query)[0]
         query += " FORMAT JSONCompact"
-        parse_data post(query)
+        parse_data post("", body = query)
       end
 
       def databases
