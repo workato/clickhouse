@@ -1,3 +1,5 @@
+require "json"
+
 require "clickhouse/connection/query/table"
 require "clickhouse/connection/query/result_set"
 require "clickhouse/connection/query/result_row"
@@ -20,7 +22,7 @@ module Clickhouse
       def query_post(query)
         query = Utils.extract_format(query)[0]
         query += " FORMAT JSONCompact"
-        parse_data post("", body = query)
+        parse_data JSON.parse(post("", body = query))
       end
 
       def databases
