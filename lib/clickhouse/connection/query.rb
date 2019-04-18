@@ -19,6 +19,13 @@ module Clickhouse
         parse_data get(query)
       end
 
+      def query_with_stats(query)
+        query = Utils.extract_format(query)[0]
+        query += " FORMAT JSONCompact"
+        response = get(query)
+        [parse_data(response), response["statistics"]]
+      end
+
       def query_post(query)
         query = Utils.extract_format(query)[0]
         query += " FORMAT JSONCompact"
