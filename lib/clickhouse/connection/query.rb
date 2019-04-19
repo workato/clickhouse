@@ -20,10 +20,25 @@ module Clickhouse
       end
 
       def query_with_stats(query)
+        start = Time.now
         query = Utils.extract_format(query)[0]
         query += " FORMAT JSONCompact"
         response = get(query)
-        [parse_data(response), response["statistics"]]
+        t1 = Time.now
+        data = parse_data(response)
+        t2 = Time.now
+        [
+          data, 
+          {
+            ch_clickhouse: response["statistics"]["elapsed"],
+            ch_client_request: response[:client_request]
+            ch_client_query: {
+              ch_start: start,
+              ch_elapsed_t1: t1 - start,
+              ch_elapsed_t2: t2 - start
+            }
+          }
+        ]
       end
 
       def query_post(query)

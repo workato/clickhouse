@@ -63,14 +63,26 @@ module Clickhouse
 
         response = client.send(method, path(query), body)
         status = response.status
-        duration = Time.now - start
+        t1 = Time.now
+        duration = t1 - start
         query, format = Utils.extract_format(query)
+        t2 = Time.now
         response = parse_body(format, response.body)
+        t3 = Time.now
         stats = parse_stats(response)
+        t4 = Time.now
 
         write_log duration, query, stats
+        t5 = Time.now
         raise QueryError, "Got status #{status} (expected 200): #{response}" unless status == 200
-        response
+        response.merge!(client_request: {
+                                          ch_start: start,
+                                          ch_elapsed_t1: t1 - start,
+                                          ch_elapsed_t2: t2 - start,
+                                          ch_elapsed_t3: t3 - start,
+                                          ch_elapsed_t4: t4 - start,
+                                          ch_elapsed_t5: t5 - start
+                                        })
 
       rescue Faraday::Error => e
         raise ConnectionError, e.message
