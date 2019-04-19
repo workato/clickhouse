@@ -81,7 +81,7 @@ module Clickhouse
                                           ch_elapsed_t2: t2 - start,
                                           ch_elapsed_t3: t3 - start,
                                           ch_elapsed_t4: t4 - start,
-                                          ch_elapsed_t5: t5 - start
+                                          ch_elapsed_t5: t5 - start 
                                         })
 
       rescue Faraday::Error => e
