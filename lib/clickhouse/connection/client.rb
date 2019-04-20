@@ -22,8 +22,8 @@ module Clickhouse
         instance_variables.include?(:@client) && !!@client
       end
 
-      def get(query)
-        request(:get, query)
+      def get(query, optimized = false)
+        request(:get, query, nil, optimized)
       end
 
       def post(query, body = nil)
@@ -56,7 +56,7 @@ module Clickhouse
         "/?#{query_string}"
       end
 
-      def request(method, query, body = nil)
+      def request(method, query, body = nil, optimized = false)
         connect!
         query = query.strip
         start = Time.now
@@ -64,16 +64,22 @@ module Clickhouse
         response = client.send(method, path(query), body)
         status = response.status
         t1 = Time.now
-        duration = t1 - start
-        query, format = Utils.extract_format(query)
-        t2 = Time.now
-        response = parse_body(format, response.body)
-        t3 = Time.now
-        stats = parse_stats(response)
-        t4 = Time.now
-
-        write_log duration, query, stats
-        t5 = Time.now
+        if optimized
+          t2 = Time.now
+          response = parse_body("JSONCompact", response.body)
+          t3 = t4 = t5 = Time.now
+        else
+          duration = t1 - start
+          query, format = Utils.extract_format(query)
+          t2 = Time.now
+          response = parse_body(format, response.body)
+          t3 = Time.now
+          stats = parse_stats(response)
+          t4 = Time.now
+          write_log(duration, query, stats)
+          t5 = Time.now
+        end
+        
         raise QueryError, "Got status #{status} (expected 200): #{response}" unless status == 200
         response.merge!(client_request: {
                                           ch_elapsed_t1_http_request: t1 - start,

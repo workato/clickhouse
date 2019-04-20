@@ -19,13 +19,13 @@ module Clickhouse
         parse_data get(query)
       end
 
-      def query_with_stats(query)
+      def query_with_stats(query, raw_data=false, optimized=false)
         start = Time.now
         query = Utils.extract_format(query)[0]
         query += " FORMAT JSONCompact"
-        response = get(query)
+        response = get(query, optimized)
         t1 = Time.now
-        data = parse_data(response)
+        data = raw_data ? response["data"] : parse_data(response)
         t2 = Time.now
         [
           data, 
