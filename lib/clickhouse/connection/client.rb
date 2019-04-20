@@ -76,12 +76,11 @@ module Clickhouse
         t5 = Time.now
         raise QueryError, "Got status #{status} (expected 200): #{response}" unless status == 200
         response.merge!(client_request: {
-                                          ch_start: start,
-                                          ch_elapsed_t1: t1 - start,
-                                          ch_elapsed_t2: t2 - start,
-                                          ch_elapsed_t3: t3 - start,
-                                          ch_elapsed_t4: t4 - start,
-                                          ch_elapsed_t5: t5 - start 
+                                          ch_elapsed_t1_http_request: t1 - start,
+                                          ch_elapsed_t2_extract_format: t2 - t1,
+                                          ch_elapsed_t3_parse_body: t3 - t2,
+                                          ch_elapsed_t4_parse_stats: t4 - t3,
+                                          ch_elapsed_t5_log_write: t5 - t4
                                         })
 
       rescue Faraday::Error => e

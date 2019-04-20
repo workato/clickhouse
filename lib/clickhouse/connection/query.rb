@@ -33,9 +33,8 @@ module Clickhouse
             ch_clickhouse: response["statistics"]["elapsed"],
             ch_client_request: response[:client_request],
             ch_client_query: {
-              ch_start: start,
-              ch_elapsed_t1: t1 - start,
-              ch_elapsed_t2: t2 - start
+              ch_elapsed_t1_query: t1 - start,
+              ch_elapsed_t2_parse_data: t2 - t1
             }
           }
         ]
