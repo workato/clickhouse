@@ -27,7 +27,7 @@ module Clickhouse
       end
 
       def post(query, body = nil)
-        request(:post, query, body)
+        request_post(:post, query, body)
       end
 
       def url
@@ -70,7 +70,7 @@ module Clickhouse
           t3 = t4 = t5 = Time.now
         else
           duration = t1 - start
-          query, format = Utils.extract_format(body || query)
+          query, format = Utils.extract_format(query)
           t2 = Time.now
           response = parse_body(format, response.body)
           t3 = Time.now
@@ -93,6 +93,26 @@ module Clickhouse
         raise ConnectionError, e.message
       end
 
+      def request_post(method, query, body = nil)
+        connect!
+        query = query.strip
+        start = Time.now
+
+        response = client.send(method, path(query), body)
+        status = response.status
+        duration = Time.now - start
+        query, format = Utils.extract_format(query)
+        response = parse_body(format, response.body)
+        stats = parse_stats(response)
+
+        write_log duration, query, stats
+        raise QueryError, "Got status #{status} (expected 200): #{response}" unless status == 200
+        response
+
+      rescue Faraday::Error => e
+        raise ConnectionError, e.message
+      end
+      
       def parse_body(format, body)
         case format
         when "JSON", "JSONCompact"
