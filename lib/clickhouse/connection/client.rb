@@ -70,7 +70,7 @@ module Clickhouse
           t3 = t4 = t5 = Time.now
         else
           duration = t1 - start
-          query, format = Utils.extract_format(query)
+          query, format = Utils.extract_format(body || query)
           t2 = Time.now
           response = parse_body(format, response.body)
           t3 = Time.now
