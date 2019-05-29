@@ -68,6 +68,11 @@ module Clickhouse
           t2 = Time.now
           response = parse_body("JSONCompact", response.body)
           t3 = t4 = t5 = Time.now
+
+          duration = t1 - start
+          stats = parse_stats(response)
+          write_log(duration, query, stats)
+
         else
           duration = t1 - start
           query, format = Utils.extract_format(query)
