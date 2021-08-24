@@ -55,6 +55,8 @@ module Clickhouse
               parse_float_value value
             when "String", "Enum8", "Enum16"
               parse_string_value value
+            when "Nullable(String)", "Nullable(Enum8)", "Nullable(Enum16)"
+              parse_nullable_string_value value
             when /FixedString\(\d+\)/
               parse_fixed_string_value value
             when "Date"
@@ -81,6 +83,12 @@ module Clickhouse
 
         def parse_string_value(value)
           value.force_encoding("UTF-8")
+        end
+
+        def parse_nullable_string_value(value)
+          return if value == ""
+
+          parse_string_value(value)
         end
 
         def parse_fixed_string_value(value)
