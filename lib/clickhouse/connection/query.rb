@@ -13,17 +13,17 @@ module Clickhouse
         body.empty? ? true : body
       end
 
-      def query(query)
+      def query(query, query_params = {})
         query = Utils.extract_format(query)[0]
         query += " FORMAT JSONCompact"
-        parse_data get(query)
+        parse_data get(query, query_params)
       end
 
-      def query_with_stats(query, raw_data=false, optimized=false)
+      def query_with_stats(query, query_params = {}, raw_data=false, optimized=false)
         start = Time.now
         query = Utils.extract_format(query)[0]
         query += " FORMAT JSONCompact"
-        response = get(query, optimized)
+        response = get(query, query_params, optimized)
         t1 = Time.now
         data = raw_data ? response["data"] : parse_data(response)
         t2 = Time.now
@@ -40,10 +40,10 @@ module Clickhouse
         ]
       end
 
-      def query_post(query)
+      def query_post(query, query_params = {})
         query = Utils.extract_format(query)[0]
         query += " FORMAT JSONCompact"
-        parse_data JSON.parse(post("", body = query))
+        parse_data JSON.parse(post("", query_params, body = query))
       end
 
       def databases

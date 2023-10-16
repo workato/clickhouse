@@ -22,12 +22,12 @@ module Clickhouse
         instance_variables.include?(:@client) && !!@client
       end
 
-      def get(query, optimized = false)
-        request(:get, query, nil, optimized)
+      def get(query, query_params = {}, optimized = false)
+        request(:get, query, query_params, nil, optimized)
       end
 
-      def post(query, body = nil)
-        request_post(:post, query, body)
+      def post(query, query_params = {}, body = nil)
+        request_post(:post, query, query_params, body)
       end
 
       def url
@@ -47,21 +47,22 @@ module Clickhouse
         client.basic_auth(username || "default", password) if username || password
       end
 
-      def path(query)
+      def path(query, query_params = {})
         params = @config.select{|k, _v| k == :database}
         params[:query] = query
         params[:output_format_write_statistics] = 1
+        params.merge!(query_params)
         query_string = params.collect{|k, v| "#{k}=#{CGI.escape(v.to_s)}"}.join("&")
 
         "/?#{query_string}"
       end
 
-      def request(method, query, body = nil, optimized = false)
+      def request(method, query, query_params = {}, body = nil, optimized = false)
         connect!
         query = query.strip
         start = Time.now
 
-        response = client.send(method, path(query), body)
+        response = client.send(method, path(query, query_params), body)
         status = response.status
         t1 = Time.now
         if optimized
@@ -98,12 +99,12 @@ module Clickhouse
         raise ConnectionError, e.message
       end
 
-      def request_post(method, query, body = nil)
+      def request_post(method, query, query_params = {}, body = nil)
         connect!
         query = query.strip
         start = Time.now
 
-        response = client.send(method, path(query), body)
+        response = client.send(method, path(query, query_params), body)
         status = response.status
         duration = Time.now - start
         query, format = Utils.extract_format(query)
