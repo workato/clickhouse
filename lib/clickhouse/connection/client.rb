@@ -23,11 +23,11 @@ module Clickhouse
       end
 
       def get(query, optimized = false, query_params = {})
-        request(:get, query, query_params, nil, optimized)
+        request(:get, query, nil, optimized, query_params)
       end
 
       def post(query, body = nil, query_params = {})
-        request_post(:post, query, query_params, body)
+        request_post(:post, query, body, query_params)
       end
 
       def url
