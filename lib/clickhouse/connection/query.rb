@@ -19,7 +19,7 @@ module Clickhouse
         parse_data get(query, query_params)
       end
 
-      def query_with_stats(query, query_params = {}, raw_data=false, optimized=false)
+      def query_with_stats(query, raw_data=false, optimized=false, query_params = {})
         start = Time.now
         query = Utils.extract_format(query)[0]
         query += " FORMAT JSONCompact"
