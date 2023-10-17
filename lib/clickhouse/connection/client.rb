@@ -51,7 +51,7 @@ module Clickhouse
         params = @config.select{|k, _v| k == :database}
         params[:query] = query
         params[:output_format_write_statistics] = 1
-        params.merge!(query_params)
+        params.merge!(query_params.transform_keys {|k| "param_#{k}" })
         query_string = params.collect{|k, v| "#{k}=#{CGI.escape(v.to_s)}"}.join("&")
 
         "/?#{query_string}"
