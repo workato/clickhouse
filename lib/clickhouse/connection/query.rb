@@ -8,22 +8,22 @@ module Clickhouse
   class Connection
     module Query
 
-      def execute(query, body = nil)
-        body = post(query, body)
+      def execute(query, body = nil, query_params = {})
+        body = post(query, body, query_params)
         body.empty? ? true : body
       end
 
       def query(query, query_params = {})
         query = Utils.extract_format(query)[0]
         query += " FORMAT JSONCompact"
-        parse_data get(query, query_params)
+        parse_data get(query, false, query_params)
       end
 
       def query_with_stats(query, raw_data=false, optimized=false, query_params = {})
         start = Time.now
         query = Utils.extract_format(query)[0]
         query += " FORMAT JSONCompact"
-        response = get(query, query_params, optimized)
+        response = get(query, optimized, query_params)
         t1 = Time.now
         data = raw_data ? response["data"] : parse_data(response)
         t2 = Time.now
@@ -43,7 +43,7 @@ module Clickhouse
       def query_post(query, query_params = {})
         query = Utils.extract_format(query)[0]
         query += " FORMAT JSONCompact"
-        parse_data JSON.parse(post("", query_params, body = query))
+        parse_data JSON.parse(post("", body = query, query_params))
       end
 
       def databases
