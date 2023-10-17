@@ -22,11 +22,11 @@ module Clickhouse
         instance_variables.include?(:@client) && !!@client
       end
 
-      def get(query, query_params = {}, optimized = false)
+      def get(query, optimized = false, query_params = {})
         request(:get, query, query_params, nil, optimized)
       end
 
-      def post(query, query_params = {}, body = nil)
+      def post(query, body = nil, query_params = {})
         request_post(:post, query, query_params, body)
       end
 
@@ -57,7 +57,7 @@ module Clickhouse
         "/?#{query_string}"
       end
 
-      def request(method, query, query_params = {}, body = nil, optimized = false)
+      def request(method, query, body = nil, optimized = false, query_params = {})
         connect!
         query = query.strip
         start = Time.now
@@ -99,7 +99,7 @@ module Clickhouse
         raise ConnectionError, e.message
       end
 
-      def request_post(method, query, query_params = {}, body = nil)
+      def request_post(method, query, body = nil, query_params = {})
         connect!
         query = query.strip
         start = Time.now

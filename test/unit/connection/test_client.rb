@@ -62,18 +62,18 @@ module Unit
         describe "#get" do
           it "sends a GET request the server" do
             @connection.instance_variable_set :@client, (client = mock)
-            client.expects(:get).with("/?query=foo&output_format_write_statistics=1&param_bar=bar", nil).returns(stub(:status => 200, :body => ""))
+            client.expects(:get).with("/?query=foo&output_format_write_statistics=1", nil).returns(stub(:status => 200, :body => ""))
             @connection.stubs(:log)
-            @connection.get("foo", bar: "bar")
+            @connection.get("foo")
           end
         end
 
         describe "#post" do
           it "sends a POST request the server" do
             @connection.instance_variable_set :@client, (client = mock)
-            client.expects(:post).with("/?query=foo&output_format_write_statistics=1&param_bar=bar", "body").returns(stub(:status => 200, :body => ""))
+            client.expects(:post).with("/?query=foo&output_format_write_statistics=1", "body").returns(stub(:status => 200, :body => ""))
             @connection.stubs(:log)
-            @connection.post("foo", { bar: "bar" }, "body")
+            @connection.post("foo", "body")
           end
         end
 
