@@ -65,6 +65,8 @@ module Clickhouse
               parse_date_time_value value
             when /DateTime\(/
               parse_date_time_value(value, type.scan(/DateTime\('(.*)'\)/)&.first&.first)
+            when /DateTime64\(/
+              parse_date_time64_value(value, type.scan(/DateTime\((\d+,\s*)?'(.+)'\)/)&.first&.last)
             when /Array\(/
               parse_array_value value
             else
@@ -101,6 +103,11 @@ module Clickhouse
 
         def parse_date_time_value(value, tz=nil)
           return nil if value == '0000-00-00 00:00:00'
+          tz ? Time.parse(value + " " + tz) : Time.parse(value)
+        end
+
+        def parse_date_time64_value(value, tz=nil)
+          return nil if value.start_with? '1970-01-01 00:00:00'
           tz ? Time.parse(value + " " + tz) : Time.parse(value)
         end
 
