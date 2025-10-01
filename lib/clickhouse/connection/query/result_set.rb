@@ -66,7 +66,7 @@ module Clickhouse
             when /DateTime\(/
               parse_date_time_value(value, type.scan(/DateTime\('(.*)'\)/)&.first&.first)
             when /DateTime64\(/
-              parse_date_time64_value(value, type.scan(/DateTime\((\d+,\s*)?'(.+)'\)/)&.first&.last)
+              parse_date_time64_value(value, type.scan(/DateTime64\(\d+,\s*'(.+)'\)/)&.first&.first)
             when /Array\(/
               parse_array_value value
             else
