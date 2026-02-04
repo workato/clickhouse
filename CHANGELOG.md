@@ -1,5 +1,7 @@
 ## Clickhouse CHANGELOG
 
+* Added support for sending custom headers
+
 ### Version 0.1.10 (January 13, 2017)
 
 * Fixed `erubis` dependency once and for all

@@ -3,6 +3,15 @@ module Clickhouse
     module Client
       include ActiveSupport::NumberHelper
 
+      def resolve_headers
+        headers_config = @config[:headers]
+        case headers_config
+        when Proc then headers_config.call || {}
+        when Hash then headers_config
+        else {}
+        end
+      end
+
       def connect!
         ping! unless connected?
       end
@@ -62,7 +71,10 @@ module Clickhouse
         query = query.strip
         start = Time.now
 
-        response = client.send(method, path(query, query_params), body)
+        headers = resolve_headers
+        response = client.send(method, path(query, query_params), body) do |req|
+          req.headers.merge!(headers)
+        end
         status = response.status
         t1 = Time.now
         if optimized
@@ -104,7 +116,10 @@ module Clickhouse
         query = query.strip
         start = Time.now
 
-        response = client.send(method, path(query, query_params), body)
+        headers = resolve_headers
+        response = client.send(method, path(query, query_params), body) do |req|
+          req.headers.merge!(headers)
+        end
         status = response.status
         duration = Time.now - start
         query, format = Utils.extract_format(query)
