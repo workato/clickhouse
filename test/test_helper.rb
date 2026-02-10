@@ -2,7 +2,7 @@ require_relative "test_helper/coverage"
 
 require "minitest"
 require "minitest/autorun"
-require "mocha/setup"
+require "mocha/minitest"
 
 def path(path)
   File.expand_path "../../#{path}", __FILE__
